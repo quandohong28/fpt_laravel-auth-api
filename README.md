@@ -13,16 +13,20 @@ This is basic laravel 10.x authentication api
 2. Create App key
 
     $ cd fpt_laravel-auth-api
-    $ cp .env.example .env
     $ php artisan key:generate
 
 
-3. Install libraries and nessesary files
+3. Run migrate
+
+    $ cp .env.example .env
+    $ php artisan migrate
+
+4. Install libraries and nessesary files
 
     $ composer i && npm i
 
 
-4. Run
+5. Run server
 
     $ php artisan serve
     $ npm run dev
