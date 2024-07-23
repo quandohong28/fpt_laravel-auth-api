@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -9,25 +10,20 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(StoreUserRequest $request)
     {
-        $validate = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        
+        $isValidate = $request->validated(); 
 
-        if ($validate) {
+        if ($isValidate) {
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-            return response()->json(['message' => 'User registered successfully!', 'user' => $user], 201);
+            return response()->json(['message' => 'Đăng ký tài khoản thành công!', 'user' => $user], 201);
         }
-        else {
-            return response()->json(['message' => 'User registered failed!'], 400);
-        }
+        return response()->json(['message' => 'Đăng ký tài khoản thất bại!'], 422);
 
     }
 
@@ -38,11 +34,11 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::guard('api')->attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $user = Auth::user();
+        $user = Auth::guard('api')->user();
         $token = $request->user()->createToken('auth_token')->plainTextToken;
         return response()->json(['token' => $token, 'user' => $user]);
     }
